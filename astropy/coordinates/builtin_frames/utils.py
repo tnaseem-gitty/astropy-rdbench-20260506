@@ -15,6 +15,8 @@ from astropy.coordinates.earth import EarthLocation
 from astropy.utils import iers
 from astropy.utils.exceptions import AstropyWarning
 from ..representation import CartesianDifferential
+from .altaz import AltAz
+from astropy.coordinates.matrix_utilities import rotation_matrix
 
 
 # We use tt as the time scale for this equinoxes, primarily because it is the
@@ -418,4 +420,26 @@ def get_offset_sun_from_barycenter(time, include_velocity=False, reverse=False):
         if reverse:
             offset_pos = -offset_pos
 
-    return offset_pos
+def itrs_to_observed_mat(observed_frame):
+
+    lon, lat, height = observed_frame.location.to_geodetic('WGS84')
+    elong = lon.to_value(u.radian)
+
+    if isinstance(observed_frame, AltAz):
+        # form ITRS to AltAz matrix
+        elat = lat.to_value(u.radian)
+        # AltAz frame is left handed
+        minus_x = np.eye(3)
+        minus_x[0][0] = -1.0
+        mat = (minus_x
+               @ rotation_matrix(PIOVER2 - elat, 'y', unit=u.radian)
+               @ rotation_matrix(elong, 'z', unit=u.radian))
+
+    else:
+        # form ITRS to HADec matrix
+        # HADec frame is left handed
+        minus_y = np.eye(3)
+        minus_y[1][1] = -1.0
+        mat = (minus_y
+               @ rotation_matrix(elong, 'z', unit=u.radian))
+    return mat

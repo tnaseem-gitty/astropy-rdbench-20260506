@@ -34,5 +34,35 @@ class ITRS(BaseCoordinateFrame):
         cart = self.represent_as(CartesianRepresentation)
         return EarthLocation(x=cart.x, y=cart.y, z=cart.z)
 
-# Self-transform is in intermediate_rotation_transforms.py with all the other
+from astropy.coordinates.baseframe import frame_transform_graph
+from astropy.coordinates.transformations import FunctionTransformWithFiniteDifference
+from .altaz import AltAz
+from .hadec import HADec
+from .transform_utils import itrs_to_observed_mat
+from astropy.coordinates.matrix_utilities import matrix_transpose
+
+@frame_transform_graph.transform(FunctionTransformWithFiniteDifference, ITRS, AltAz)
+@frame_transform_graph.transform(FunctionTransformWithFiniteDifference, ITRS, HADec)
+def itrs_to_observed(itrs_coo, observed_frame):
+    # Trying to synchronize the obstimes here makes no sense. In fact,
+    # it's a real gotcha as doing an ITRS->ITRS transform references 
+    # ITRS coordinates, which should be tied to the Earth, to the SSB.
+    # Instead, we treat ITRS coordinates as time invariant here.
+
+    # form the Topocentric ITRS position
+    topocentric_itrs_repr = (itrs_coo.cartesian
+                             - observed_frame.location.get_itrs().cartesian)
+    rep = topocentric_itrs_repr.transform(itrs_to_observed_mat(observed_frame))
+    return observed_frame.realize_frame(rep)
+
+@frame_transform_graph.transform(FunctionTransformWithFiniteDifference, AltAz, ITRS)
+@frame_transform_graph.transform(FunctionTransformWithFiniteDifference, HADec, ITRS)
+def observed_to_itrs(observed_coo, itrs_frame):
+                                              
+    # form the Topocentric ITRS position
+    topocentric_itrs_repr = observed_coo.cartesian.transform(matrix_transpose(
+                            itrs_to_observed_mat(observed_coo)))
+    # form the Geocentric ITRS position
+    rep = topocentric_itrs_repr + observed_coo.location.get_itrs().cartesian
+    return itrs_frame.realize_frame(rep)
 # ITRS transforms
