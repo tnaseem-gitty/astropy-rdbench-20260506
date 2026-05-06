@@ -255,6 +255,11 @@ class Quantity(np.ndarray, metaclass=InheritDocstrings):
     Quantities can also be created by multiplying a number or array with a
     :class:`~astropy.units.Unit`. See http://docs.astropy.org/en/latest/units/
 
+    When creating a Quantity from a float value, the precision of the input is preserved.
+    This includes preserving float16 values, which are not automatically converted to
+    higher precision types during creation. However, note that arithmetic operations
+    and unit conversions may promote float16 to float64 to maintain precision.
+
     """
     # Need to set a class-level default for _equivalencies, or
     # Constants can not initialize properly
@@ -377,7 +382,8 @@ class Quantity(np.ndarray, metaclass=InheritDocstrings):
                             "Numpy numeric type.")
 
         # by default, cast any integer, boolean, etc., to float
-        if dtype is None and (not (np.can_cast(np.float32, value.dtype)
+        # Preserve float16 and other float types, but cast any integer, boolean, etc., to float
+        if dtype is None and (not (np.can_cast(np.float16, value.dtype)
                                    or value.dtype.fields)
                               or value.dtype.kind == 'O'):
             value = value.astype(float)

@@ -25,8 +25,8 @@ try:
     import matplotlib
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
-    from distutils.version import LooseVersion
-    MATPLOTLIB_LT_15 = LooseVersion(matplotlib.__version__) < LooseVersion("1.5")
+    from packaging import version
+    MATPLOTLIB_LT_15 = version.parse(matplotlib.__version__) < version.parse("1.5")
     HAS_MATPLOTLIB = True
 except ImportError:
     HAS_MATPLOTLIB = False
@@ -333,6 +333,26 @@ class TestQuantityCreation:
         assert len(warning_lines) == 1
         assert warning_lines[0].category == AstropyWarning
         assert 'is not implemented' in str(warning_lines[0].message)
+
+    def test_float16_preservation(self):
+        # Test that float16 values are preserved when creating Quantity objects
+        float16_value = np.float16(1.23)
+        q = u.Quantity(float16_value, u.m)
+        assert q.dtype == np.float16
+        assert q.value == float16_value
+        assert q.unit == u.m
+
+        # Test that float16 is promoted to float64 in arithmetic operations (expected behavior)
+        q2 = q * 2
+        assert q2.dtype == np.float64
+        assert q2.value == float16_value * 2
+        assert q2.unit == u.m
+
+        # Test that float16 is promoted to float64 in unit conversions (expected behavior)
+        q3 = q.to(u.cm)
+        assert q3.dtype == np.float64
+        assert np.isclose(q3.value, float16_value * 100)
+        assert q3.unit == u.cm
 
 
 class TestQuantityOperations:
