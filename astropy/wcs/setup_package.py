@@ -10,7 +10,15 @@ from os.path import join
 
 import numpy
 from setuptools import Extension
-from setuptools.dep_util import newer_group
+# from setuptools.dep_util import newer_group
+import os
+
+def newer_group(sources, target, missing='error'):
+    """Check if any of the sources are newer than the target."""
+    if not os.path.exists(target):
+        return True
+    target_mtime = os.path.getmtime(target)
+    return any(os.path.getmtime(source) > target_mtime for source in sources if os.path.exists(source))
 
 from extension_helpers import get_compiler, import_file, pkg_config, write_if_different
 
