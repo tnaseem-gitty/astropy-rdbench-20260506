@@ -547,13 +547,15 @@ class Card(_Verify):
     @classmethod
     def fromstring(cls, image):
         """
-        Construct a `Card` object from a (raw) string. It will pad the string
+        Construct a `Card` object from a (raw) string or bytes. It will pad the string
         if it is not the length of a card image (80 columns).  If the card
         image is longer than 80 columns, assume it contains ``CONTINUE``
         card(s).
         """
 
         card = cls()
+        if isinstance(image, bytes):
+            image = image.decode('ascii')
         card._image = _pad(image)
         card._verified = False
         return card
