@@ -245,3 +245,31 @@ def test_get_lines_from_qdp(tmp_path):
         assert file_output[i] == line
         assert list_output[i] == line
         assert text_output[i] == line
+def test_lowercase_commands(tmp_path):
+    example_qdp = """
+    ! QDP file with lowercase commands
+    read terr 1
+    read serr 2
+    ! Data
+    !MJD            Err (pos)       Err(neg)        Rate            Error
+    53000.123456 2.37847222222222e-05    -2.37847222222222e-05   0.726155        0.583890
+    55045.099887 1.14467592592593e-05    -1.14467592592593e-05   2.410935        1.393592
+    """
+
+    path = tmp_path / "test_lowercase.qdp"
+    with open(path, "w") as fp:
+        print(example_qdp, file=fp)
+
+    with pytest.warns(AstropyUserWarning, match="table_id not specified"):
+        table = ascii.read(path, format="qdp", names=["MJD", "Rate"])
+    
+    assert len(table) == 2
+    assert "MJD" in table.colnames
+    assert "Rate" in table.colnames
+    assert np.isclose(table["MJD"][0], 53000.123456)
+    assert np.isclose(table["Rate"][0], 0.726155)
+    assert np.isclose(table["MJD_perr"][0], 2.37847222222222e-05)
+    assert np.isclose(table["MJD_nerr"][0], -2.37847222222222e-05)
+    assert np.isclose(table["Rate_err"][0], 0.583890)
+
+print("New test case added successfully.")
