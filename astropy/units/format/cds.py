@@ -181,13 +181,13 @@ class CDS(Base):
 
         def p_division_of_units(p):
             """
-            division_of_units : DIVISION unit_expression
+            division_of_units : unit_expression DIVISION unit_expression
                               | unit_expression DIVISION combined_units
             """
-            if len(p) == 3:
-                p[0] = p[2] ** -1
-            else:
+            if len(p) == 4:
                 p[0] = p[1] / p[3]
+            else:
+                p[0] = p[2] ** -1
 
         def p_unit_expression(p):
             """
@@ -260,7 +260,20 @@ class CDS(Base):
         def p_error(p):
             raise ValueError()
 
-        return parsing.yacc(tabmodule="cds_parsetab", package="astropy/units")
+        print("Initializing CDS parser")
+        cls._parser = parsing.yacc(tabmodule="cds_parsetab", package="astropy/units")
+        cls._parser = parsing.yacc(tabmodule="cds_parsetab", package="astropy/units")
+        cls._parser = parsing.yacc(tabmodule="cds_parsetab", package="astropy/units")
+        cls._parser = parsing.yacc(tabmodule="cds_parsetab", package="astropy/units")
+        cls._parser = parsing.yacc(tabmodule="cds_parsetab", package="astropy/units")
+        cls._parser = parsing.yacc(tabmodule="cds_parsetab", package="astropy/units")
+        cls._parser = parsing.yacc(tabmodule="cds_parsetab", package="astropy/units")
+        cls._parser = parsing.yacc(tabmodule="cds_parsetab", package="astropy/units")
+        cls._parser = parsing.yacc(tabmodule="cds_parsetab", package="astropy/units")
+        cls._parser = parsing.yacc(tabmodule="cds_parsetab", package="astropy/units")
+        cls._parser = parsing.yacc(tabmodule="cds_parsetab", package="astropy/units")
+        cls._parser = parsing.yacc(tabmodule="cds_parsetab", package="astropy/units")
+        cls._parser = parsing.yacc(tabmodule="cds_parsetab", package="astropy/units")
 
     @classmethod
     def _get_unit(cls, t):
@@ -288,6 +301,7 @@ class CDS(Base):
         return cls._units[unit]
 
     @classmethod
+    @classmethod
     def parse(cls, s, debug=False):
         if " " in s:
             raise ValueError("CDS unit must not contain whitespace")
@@ -298,10 +312,19 @@ class CDS(Base):
         # This is a short circuit for the case where the string
         # is just a single unit name
         try:
-            return cls._parse_unit(s, detailed_exception=False)
+            print(f"Parsing single unit: {s}")
+            return CDS._parse_unit(s, detailed_exception=False)
         except ValueError:
             try:
-                return cls._parser.parse(s, lexer=cls._lexer, debug=debug)
+                print(f"Parsing complex unit: {s}")
+                result = cls._parser.parse(s, lexer=cls._lexer, debug=debug)
+                print(f"Parsed result: {result}")
+                return result
+            except ValueError as e:
+                if str(e):
+                    raise ValueError(str(e))
+                else:
+                    raise ValueError("Syntax error")
             except ValueError as e:
                 if str(e):
                     raise ValueError(str(e))
