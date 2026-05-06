@@ -208,7 +208,6 @@ def _coord_matrix(model, pos, noutp):
             mat[-model.n_outputs:, -model.n_inputs:] = 1
     else:
         mat = np.zeros((noutp, model.n_inputs))
-
         for i in range(model.n_inputs):
             mat[i, i] = 1
         if pos == 'right':
@@ -306,12 +305,11 @@ def _separable(transform):
     elif isinstance(transform, CompoundModel):
         sepleft = _separable(transform.left)
         sepright = _separable(transform.right)
-        return _operators[transform.op](sepleft, sepright)
-    elif isinstance(transform, Model):
-        return _coord_matrix(transform, 'left', transform.n_outputs)
-
-
-# Maps modeling operators to a function computing and represents the
-# relationship of axes as an array of 0-es and 1-s
+        if transform.op == '&':
+            return _cstack(sepleft, sepright)
+        elif transform.op == '|':
+            return _cdot(sepleft, sepright)
+        else:
+            return np.zeros((transform.n_outputs, transform.n_inputs), dtype=bool)
 _operators = {'&': _cstack, '|': _cdot, '+': _arith_oper, '-': _arith_oper,
               '*': _arith_oper, '/': _arith_oper, '**': _arith_oper}
