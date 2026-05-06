@@ -667,11 +667,13 @@ class Quantity(np.ndarray):
         arrays = []
         for input_, converter in zip(inputs, converters):
             input_ = getattr(input_, "value", input_)
-            arrays.append(converter(input_) if converter else input_)
+            try:
+                arrays.append(converter(input_) if converter else input_)
+            except ValueError:
+                return NotImplemented
 
         # Call our superclass's __array_ufunc__
-        result = super().__array_ufunc__(function, method, *arrays, **kwargs)
-        # If unit is None, a plain array is expected (e.g., comparisons), which
+        result = super().__array_ufunc__(function, method, *arrays, **kwargs)        # If unit is None, a plain array is expected (e.g., comparisons), which
         # means we're done.
         # We're also done if the result was None (for method 'at') or
         # NotImplemented, which can happen if other inputs/outputs override
