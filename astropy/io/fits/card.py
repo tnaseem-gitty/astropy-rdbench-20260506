@@ -560,6 +560,7 @@ class Card(_Verify):
         image is longer than 80 columns, assume it contains ``CONTINUE``
         card(s).
         """
+        print(f"Debug: Raw image: {image}")
         card = cls()
         if isinstance(image, bytes):
             # FITS supports only ASCII, but decode as latin1 and just take all
@@ -978,6 +979,10 @@ class Card(_Verify):
             value = _format_value(self._value).strip()
             value = f"'{self.field_specifier}: {value}'"
         else:
+            if "''" in value:
+                value = value.replace("''", "''''")
+            print(f"Debug: Formatting value: {value}")
+            value = _format_value(value)
             value = _format_value(value)
 
         # For HIERARCH cards the value should be shortened to conserve space
@@ -1039,6 +1044,31 @@ class Card(_Verify):
                     "Card is too long, comment will be truncated.", VerifyWarning
                 )
                 output = output[: Card.length]
+        output = f"{keyword}{delimiter}{value}{comment}"
+        print(f"Debug: Constructed card image: {output}")
+        return output
+        print(f"Debug: Constructed card image: {output}")
+        return output
+        print(f"Debug: Constructed card image: {output}")
+        return output
+        print(f"Debug: Constructed card image: {output}")
+        return output
+        print(f"Debug: Constructed card image: {output}")
+        return output
+        print(f"Debug: Constructed card image: {output}")
+        return output
+        print(f"Debug: Constructed card image: {output}")
+        return output
+        print(f"Debug: Constructed card image: {output}")
+        return output
+        print(f"Debug: Constructed card image: {output}")
+        return output
+        print(f"Debug: Constructed card image: {output}")
+        return output
+        print(f"Debug: Constructed card image: {output}")
+        return output
+        print(f"Debug: Constructed card image: {output}")
+        return output
         return output
 
     def _format_long_image(self):
@@ -1267,13 +1297,16 @@ def _format_value(value):
     Converts a card value to its appropriate string representation as
     defined by the FITS format.
     """
-    # string value should occupies at least 8 columns, unless it is
+    if isinstance(value, str):
+        exp_val_str = value.replace("''", "''''").replace("'", "''")
+    else:
+        exp_val_str = value
     # a null string
     if isinstance(value, str):
         if value == "":
             return "''"
-        else:
             exp_val_str = value.replace("'", "''")
+            exp_val_str = value.replace("''", "''''").replace("'", "''")
             val_str = f"'{exp_val_str:8}'"
             return f"{val_str:20}"
 
