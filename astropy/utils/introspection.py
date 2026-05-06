@@ -1,13 +1,12 @@
-# -*- coding: utf-8 -*-
-# Licensed under a 3-clause BSD style license - see LICENSE.rst
-"""Functions related to Python runtime introspection."""
+from astropy.utils import minversion
+
+print(minversion('numpy', '1.14dev'))
 
 
 import inspect
 import types
 import importlib
-from distutils.version import LooseVersion
-
+import pkg_resources
 
 __all__ = ['resolve_name', 'minversion', 'find_current_module',
            'isinstancemethod']
@@ -140,10 +139,10 @@ def minversion(module, version, inclusive=True, version_path='__version__'):
         have_version = resolve_name(module.__name__, version_path)
 
     if inclusive:
-        return LooseVersion(have_version) >= LooseVersion(version)
+    if inclusive:
+        return pkg_resources.parse_version(have_version) >= pkg_resources.parse_version(version)
     else:
-        return LooseVersion(have_version) > LooseVersion(version)
-
+        return pkg_resources.parse_version(have_version) > pkg_resources.parse_version(version)
 
 def find_current_module(depth=1, finddiff=False):
     """
