@@ -896,7 +896,8 @@ class SkyCoord(ShapedLikeNDArray):
 
         # Fail
         raise AttributeError(
-            f"'{self.__class__.__name__}' object has no attribute '{attr}'"
+            f"'{self.__class__.__name__}' object has no attribute '{attr}'. "
+            f"The error occurred while accessing '{attr}'."
         )
 
     def __setattr__(self, attr, val):
