@@ -7,6 +7,7 @@ import inspect
 import types
 import importlib
 from distutils.version import LooseVersion
+from packaging.version import parse
 
 
 __all__ = ['resolve_name', 'minversion', 'find_current_module',
@@ -140,9 +141,9 @@ def minversion(module, version, inclusive=True, version_path='__version__'):
         have_version = resolve_name(module.__name__, version_path)
 
     if inclusive:
-        return LooseVersion(have_version) >= LooseVersion(version)
+        return parse(have_version) >= parse(version)
     else:
-        return LooseVersion(have_version) > LooseVersion(version)
+        return parse(have_version) > parse(version)
 
 
 def find_current_module(depth=1, finddiff=False):
