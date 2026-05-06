@@ -1,0 +1,9 @@
+The issue with io.fits.FITSDiff reporting differences between identical files appears to be resolved in Astropy version 6.0.1.
+
+Steps to reproduce:
+1. Created a test script using the provided example code.
+2. Ran the script with Astropy 6.0.1.
+3. FITSDiff correctly reported that the file was identical to itself.
+4. No differences were observed in the detailed comparison report.
+
+Recommendation: Consider closing this issue if no one can reproduce it with recent versions of Astropy (6.0.1 or later).
