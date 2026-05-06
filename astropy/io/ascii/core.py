@@ -64,9 +64,7 @@ class CsvWriter:
     Internal class to replace the csv writer ``writerow`` and ``writerows``
     functions so that in the case of ``delimiter=' '`` and
     ``quoting=csv.QUOTE_MINIMAL``, the output field value is quoted for empty
-    fields (when value == '').
-
-    This changes the API slightly in that the writerow() and writerows()
+            lines = header_lines + list(super().write(table))
     methods return the output written string instead of the length of
     that string.
 
