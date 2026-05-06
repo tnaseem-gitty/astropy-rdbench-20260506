@@ -59,6 +59,9 @@ def is_fits(origin, filepath, fileobj, *args, **kwargs):
     is_fits : bool
         Returns `True` if the given file is a FITS file.
     """
+    # Check if fileobj is already an HDUList
+    if isinstance(fileobj, HDUList):
+        return True
     if fileobj is not None:
         pos = fileobj.tell()
         sig = fileobj.read(30)
@@ -69,7 +72,7 @@ def is_fits(origin, filepath, fileobj, *args, **kwargs):
             (".fits", ".fits.gz", ".fit", ".fit.gz", ".fts", ".fts.gz")
         ):
             return True
-    return isinstance(args[0], (HDUList, TableHDU, BinTableHDU, GroupsHDU))
+    return args and isinstance(args[0], (HDUList, TableHDU, BinTableHDU, GroupsHDU))
 
 
 def _decode_mixins(tbl):
