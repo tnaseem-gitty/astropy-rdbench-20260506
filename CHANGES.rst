@@ -181,14 +181,16 @@ astropy.modeling
   of using the ``wofz`` method using the `scipy.special.wofz` implementation of the
   Fadeeva function whenever `scipy` is installed. [#14013]
 
-- Deprecated ``astropy.modeling.utils.comb()`` function in favor of ``comb()``
-  from ``math`` standard library. [#14038]
+  from ``scipy.special``. [#14013]
 
-- Propagate measurement uncertainties via the ``weights`` keyword argument into the
-  parameter covariances. [#14519]
+Bug Fixes
+---------
 
-astropy.units
-^^^^^^^^^^^^^
+astropy.nddata
+^^^^^^^^^^^^^^
+
+- Fixed an issue with mask propagation in NDDataRef arithmetic operations when one operand doesn't have a mask. [#XXXX]
+
 
 - The conversion of ``astropy.units.Quantity`` to ``bool``
   that was deprecated since astropy 3.0 now raises a ``ValueError``.

@@ -707,3 +707,26 @@ def test_collapse(mask, unit, propagate_uncertainties, operation_ignores_mask):
             # as the data array, so we can just check for equality:
             if method in ext_methods and propagate_uncertainties:
                 assert np.ma.all(np.ma.equal(astropy_method, nddata_method))
+def test_arithmetic_mask_propagation():
+    from astropy.nddata import NDDataRef
+    import numpy as np
+
+    array = np.array([[0, 1, 0], [1, 0, 1], [0, 1, 0]])
+    mask = np.array([[0, 1, 1], [1, 0, 1], [0, 1, 0]])
+
+    nref_nomask = NDDataRef(array)
+    nref_mask = NDDataRef(array, mask=mask)
+
+    # Test multiplication of masked and unmasked NDDataRef
+    result = nref_mask.multiply(nref_nomask)
+    assert np.array_equal(result.mask, mask), "Mask not propagated correctly in multiplication"
+
+    # Test addition of masked and unmasked NDDataRef
+    result = nref_mask.add(nref_nomask)
+    assert np.array_equal(result.mask, mask), "Mask not propagated correctly in addition"
+
+    # Test multiplication with a constant
+    result = nref_mask.multiply(2)
+    assert np.array_equal(result.mask, mask), "Mask not propagated correctly in multiplication with constant"
+
+    print("All mask propagation tests passed successfully.")

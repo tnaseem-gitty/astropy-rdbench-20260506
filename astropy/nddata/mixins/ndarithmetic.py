@@ -486,8 +486,11 @@ class NDArithmeticMixin:
         """
         Calculate the resulting mask.
 
-        This is implemented as the piecewise ``or`` operation if both have a
-        mask.
+        This method handles mask propagation for arithmetic operations.
+        The behavior is as follows:
+        - If neither operand has a mask, return None.
+        - If only one operand has a mask, return a copy of that mask.
+        - If both operands have masks, use the handle_mask function.
 
         Parameters
         ----------
@@ -508,24 +511,17 @@ class NDArithmeticMixin:
         Returns
         -------
         result_mask : any type
-            If only one mask was present this mask is returned.
-            If neither had a mask ``None`` is returned. Otherwise
-            ``handle_mask`` must create (and copy) the returned mask.
+            The resulting mask after the arithmetic operation.
         """
-        # If only one mask is present we need not bother about any type checks
-        if (
-            self.mask is None and operand is not None and operand.mask is None
-        ) or handle_mask is None:
+        # Fix for issue: mask propagation fails when one operand doesn't have a mask
+        if self.mask is None and (operand is None or operand.mask is None):
             return None
-        elif self.mask is None and operand is not None:
-            # Make a copy so there is no reference in the result.
-            return deepcopy(operand.mask)
-        elif operand is None:
+        elif self.mask is not None and (operand is None or operand.mask is None):
             return deepcopy(self.mask)
+        elif self.mask is None and operand is not None and operand.mask is not None:
+            return deepcopy(operand.mask)
         else:
-            # Now lets calculate the resulting mask (operation enforces copy)
             return handle_mask(self.mask, operand.mask, **kwds)
-
     def _arithmetic_wcs(self, operation, operand, compare_wcs, **kwds):
         """
         Calculate the resulting wcs.
