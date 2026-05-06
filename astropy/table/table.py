@@ -1241,6 +1241,11 @@ class Table:
 
         # Structured ndarray gets viewed as a mixin unless already a valid
         # mixin class
+        warnings.warn(
+            "In future versions (5.2), structured arrays will be added as a Column. "
+            "Please wrap your data in a Column to avoid this warning.",
+            FutureWarning
+        )
         if (not isinstance(data, Column) and not data_is_mixin
                 and isinstance(data, np.ndarray) and len(data.dtype) > 1):
             data = data.view(NdarrayMixin)
