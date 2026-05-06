@@ -347,13 +347,12 @@ class Header:
         header
             A new `Header` instance.
         """
-
         cards = []
-
+        if isinstance(data, bytes):
+            data = data.decode('ascii')
         # If the card separator contains characters that may validly appear in
         # a card, the only way to unambiguously distinguish between cards is to
-        # require that they be Card.length long.  However, if the separator
-        # contains non-valid characters (namely \n) the cards may be split
+        # require that they be Card.length long.  However, if the separator        # contains non-valid characters (namely \n) the cards may be split
         # immediately at the separator
         require_full_cardlength = set(sep).issubset(VALID_HEADER_CHARS)
 

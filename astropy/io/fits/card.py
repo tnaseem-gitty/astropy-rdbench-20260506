@@ -552,11 +552,11 @@ class Card(_Verify):
         image is longer than 80 columns, assume it contains ``CONTINUE``
         card(s).
         """
-
+        if isinstance(image, bytes):
+            image = image.decode('ascii')
         card = cls()
         card._image = _pad(image)
-        card._verified = False
-        return card
+        card._verified = False        return card
 
     @classmethod
     def normalize_keyword(cls, keyword):
