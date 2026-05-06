@@ -339,11 +339,15 @@ class HTML(core.BaseReader):
         self.outputter = HTMLOutputter()
         return super().read(table)
 
-    def write(self, table):
+    def write(self, table, formats=None):
+        print("Formats argument inside write function:", formats)
+        print("Formats argument inside write function:", formats)
+        print("Formats argument inside write function:", formats)
+        print("Formats argument inside write function:", formats)
         """
         Return data in ``table`` converted to HTML as a list of strings.
         """
-        # Check that table has only 1-d or 2-d columns. Above that fails.
+        print("Formats argument inside write function:", formats)
         self._check_multidim_table(table)
 
         cols = list(table.columns.values())
@@ -424,6 +428,10 @@ class HTML(core.BaseReader):
                         new_cols = []
 
                         for col, col_escaped in zip(cols, cols_escaped):
+                            if formats and col.info.name in formats:
+                                col_format = formats[col.info.name]
+                            else:
+                                col_format = str
                             if len(col.shape) > 1 and self.html['multicol']:
                                 span = col.shape[1]
                                 for i in range(span):
@@ -445,11 +453,12 @@ class HTML(core.BaseReader):
                     for row in zip(*col_str_iters):
                         with w.tag('tr'):
                             for el, col_escaped in zip(row, new_cols_escaped):
-                                # Potentially disable HTML escaping for column
+                                formatted_el = col_format(el)
+                                print(f"Applying format to column {col.info.name}: {el} -> {formatted_el}")
                                 method = ('escape_xml' if col_escaped else 'bleach_clean')
                                 with w.xml_cleaning_method(method, **raw_html_clean_kwargs):
                                     w.start('td')
-                                    w.data(el.strip())
+                                    w.data(formatted_el.strip())
                                     w.end(indent=False)
 
         # Fixes XMLWriter's insertion of unwanted line breaks
