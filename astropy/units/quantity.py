@@ -376,15 +376,15 @@ class Quantity(np.ndarray, metaclass=InheritDocstrings):
             raise TypeError("The value must be a valid Python or "
                             "Numpy numeric type.")
 
-        # by default, cast any integer, boolean, etc., to float
+        # by default, cast any integer, boolean, etc., to float, but preserve float16
         if dtype is None and (not (np.can_cast(np.float32, value.dtype)
                                    or value.dtype.fields)
                               or value.dtype.kind == 'O'):
-            value = value.astype(float)
+            if value.dtype != np.float16:
+                value = value.astype(float)
 
         value = value.view(cls)
-        value._set_unit(value_unit)
-        if unit is value_unit:
+        value._set_unit(value_unit)        if unit is value_unit:
             return value
         else:
             # here we had non-Quantity input that had a "unit" attribute
