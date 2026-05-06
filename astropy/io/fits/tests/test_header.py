@@ -2793,4 +2793,40 @@ class TestRecordValuedKeywordCards(FitsTestCase):
 
         with open(self.temp('mode.fits'), mode=mode) as ff:
             hdu = fits.ImageHDU(data=np.ones(5))
-            hdu.writeto(ff)
+def test_header_fromstring_bytes():
+    """Test Header.fromstring with bytes input."""
+    header_str = b"SIMPLE  =                    T / file does conform to FITS standard             BITPIX  =                   16 / number of bits per data pixel                  NAXIS   =                    0 / number of data axes                            END                                                                             "
+    header = fits.Header.fromstring(header_str)
+    assert isinstance(header, fits.Header)
+    assert len(header) == 3
+    assert header['SIMPLE'] == True
+    assert header['BITPIX'] == 16
+    assert header['NAXIS'] == 0
+
+def test_header_fromstring_str():
+    """Test Header.fromstring with str input."""
+    header_str = "SIMPLE  =                    T / file does conform to FITS standard             BITPIX  =                   16 / number of bits per data pixel                  NAXIS   =                    0 / number of data axes                            END                                                                             "
+    header = fits.Header.fromstring(header_str)
+    assert isinstance(header, fits.Header)
+    assert len(header) == 3
+    assert header['SIMPLE'] == True
+    assert header['BITPIX'] == 16
+    assert header['NAXIS'] == 0
+
+def test_card_fromstring_bytes():
+    """Test Card.fromstring with bytes input."""
+    card_str = b"SIMPLE  =                    T / file does conform to FITS standard             "
+    card = fits.Card.fromstring(card_str)
+    assert isinstance(card, fits.Card)
+    assert card.keyword == 'SIMPLE'
+    assert card.value == True
+    assert card.comment == 'file does conform to FITS standard'
+
+def test_card_fromstring_str():
+    """Test Card.fromstring with str input."""
+    card_str = "SIMPLE  =                    T / file does conform to FITS standard             "
+    card = fits.Card.fromstring(card_str)
+    assert isinstance(card, fits.Card)
+    assert card.keyword == 'SIMPLE'
+    assert card.value == True
+    assert card.comment == 'file does conform to FITS standard'
