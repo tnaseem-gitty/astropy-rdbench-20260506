@@ -18,11 +18,12 @@ class SimpleRSTHeader(FixedWidthHeader):
     start_line = 1
     splitter_class = DefaultSplitter
     position_char = "="
+    # Allow header_rows to be used for multi-row headers
+    header_rows = None
 
     def get_fixedwidth_params(self, line):
         vals, starts, ends = super().get_fixedwidth_params(line)
-        # The right hand column can be unbounded
-        ends[-1] = None
+        # The right hand column can be unbounded        ends[-1] = None
         return vals, starts, ends
 
 
@@ -57,8 +58,8 @@ class RST(FixedWidth):
     data_class = SimpleRSTData
     header_class = SimpleRSTHeader
 
-    def __init__(self):
-        super().__init__(delimiter_pad=None, bookend=False)
+    def __init__(self, header_rows=None):
+        super().__init__(delimiter_pad=None, bookend=False, header_rows=header_rows)
 
     def write(self, lines):
         lines = super().write(lines)
