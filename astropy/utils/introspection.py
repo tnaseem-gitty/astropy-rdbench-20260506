@@ -6,11 +6,13 @@
 import inspect
 import types
 import importlib
-from distutils.version import LooseVersion
+try:
+    from packaging.version import Version
+except ImportError:
+    from distutils.version import LooseVersion as Version
 
 
-__all__ = ['resolve_name', 'minversion', 'find_current_module',
-           'isinstancemethod']
+__all__ = ['resolve_name', 'minversion', 'find_current_module',           'isinstancemethod']
 
 
 __doctest_skip__ = ['find_current_module']
@@ -140,13 +142,12 @@ def minversion(module, version, inclusive=True, version_path='__version__'):
         have_version = resolve_name(module.__name__, version_path)
 
     if inclusive:
-        return LooseVersion(have_version) >= LooseVersion(version)
+        return Version(have_version) >= Version(version)
     else:
-        return LooseVersion(have_version) > LooseVersion(version)
+        return Version(have_version) > Version(version)
 
 
-def find_current_module(depth=1, finddiff=False):
-    """
+def find_current_module(depth=1, finddiff=False):    """
     Determines the module/package from which this function is called.
 
     This function has two modes, determined by the ``finddiff`` option. it
